@@ -1,0 +1,75 @@
+You are a senior full-stack developer building a **Local Land Price Estimator API & Webapp** for India’s real estate market. It must be production-ready, API-first, with a clean web UI and proper data handling.
+
+Goal:
+- Build a webapp + REST API that estimates land prices in India based on city, locality, plot size, road width, nearby infrastructure, and recent market trends.
+- Data source can be a combination of static datasets (seeded from government open data CSVs) + ability to update manually in admin panel.
+- The estimator should work even if API calls to external services fail (fallback to local model/data).
+- Must be deployable on Replit free tier and exportable to GitHub.
+
+Deliverables:
+1. **File Structure**:
+   - backend/ (Flask or FastAPI for API endpoints)
+   - frontend/ (HTML, CSS, JS or simple React app)
+   - data/ (seed CSVs: city-level, locality-level, infrastructure multipliers)
+   - model/ (basic price prediction logic using regression or weighted scoring)
+   - tests/ (unit tests for API)
+   - README.md
+   - requirements.txt / package.json
+   - LICENSE (MIT)
+   - config.json (for base settings)
+   - scripts/update_data.py (to refresh CSVs)
+   - Dockerfile (optional for production)
+
+2. **Core Features**:
+   - API endpoint: `/estimate` (POST/GET) → Input: {state, city, locality, plot_size_sqft, road_width_ft, nearby_schools, nearby_metro, commercial_area, year}
+   - Output: JSON → estimated_price_per_sqft, total_estimated_price, confidence_score, data_sources
+   - Admin panel: Secure login, CSV upload/update for latest prices & multipliers.
+   - Price calculation formula:
+       base_price_per_sqft (from dataset)  
+       × location_multiplier (city/locality demand index)  
+       × infra_multiplier (road width, metro, schools, commercial proximity)  
+       × year_trend_factor (inflation/market trend data)
+   - Fallback: If locality not found, use nearest city average.
+   - Multi-language support: English + Hindi UI labels.
+   - Currency: ₹ INR, formatted with commas.
+
+3. **Data Handling**:
+   - Seed datasets: Use mock/sample CSVs with ~50 cities, ~200 localities.
+   - Allow manual override in admin panel.
+   - Store datasets as CSV or SQLite DB.
+   - Include script to parse new government price data (format instructions in README).
+
+4. **Frontend Requirements**:
+   - Simple, responsive UI with form inputs → fetch estimates from API.
+   - Show result card with price breakdown & factors considered.
+   - Show a "Download PDF report" button (client-side generated).
+   - Mobile-friendly layout for brokers & buyers on the go.
+
+5. **API Security**:
+   - API key-based authentication for external API consumers.
+   - Rate limiting (50 req/hour free tier).
+   - CORS enabled for specific domains.
+   - Input validation & error handling for invalid parameters.
+
+6. **Tests**:
+   - Unit tests for API endpoints.
+   - Test price calculation with known sample data.
+   - Test missing locality fallback behavior.
+
+7. **Deployment**:
+   - Deployable on Replit free tier (Flask/FastAPI backend + static frontend).
+   - Instructions in README to also deploy on Railway/Render/Heroku.
+   - Exportable as a ZIP + push-ready for GitHub.
+
+8. **Extra Features (if possible)**:
+   - Allow price adjustments for agricultural vs residential vs commercial.
+   - Save user’s recent searches in local storage.
+   - Provide CSV export of estimates.
+
+Constraints:
+- Must run fully on Replit without paid add-ons.
+- No external paid API dependencies.
+- Code must be clean, modular, and documented.
+- Keep datasets under 5MB for free hosting compatibility.
+
+Now: Generate the complete working project, starting with the file tree, then each file’s content. Include at least one example dataset CSV for testing.

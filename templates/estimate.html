@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Price Estimate - {{ input_data.city }}, {{ input_data.state }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Result Header -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-5 mb-3">
+                <i class="fas fa-chart-line text-success me-3"></i>
+                Price Estimate
+            </h1>
+            <p class="lead text-muted">
+                {{ input_data.locality or input_data.city }}, {{ input_data.state }}
+            </p>
+        </div>
+    </div>
+    
+    <!-- Main Results -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-rupee-sign me-2"></i>
+                        Estimated Value
+                    </h3>
+                </div>
+                <div class="card-body text-center">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h2 class="display-6 text-primary mb-2">
+                                {{ result.formatted_price_per_sqft }}
+                            </h2>
+                            <p class="text-muted mb-0">Per Square Foot</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h2 class="display-6 text-success mb-2">
+                                {{ result.formatted_total_price }}
+                            </h2>
+                            <p class="text-muted mb-0">Total Value ({{ input_data.plot_size }} sq ft)</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Confidence Score -->
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <span class="me-3">Confidence Score:</span>
+                            <div class="progress" style="width: 200px; height: 25px;">
+                                <div class="progress-bar 
+                                    {% if result.confidence_score >= 0.8 %}bg-success
+                                    {% elif result.confidence_score >= 0.6 %}bg-warning
+                                    {% else %}bg-danger{% endif %}" 
+                                    role="progressbar" 
+                                    style="width: {{ (result.confidence_score * 100)|round }}%">
+                                    {{ (result.confidence_score * 100)|round }}%
+                                </div>
+                            </div>
+                        </div>
+                        <small class="text-muted d-block mt-2">
+                            {% if result.confidence_score >= 0.8 %}
+                                High confidence - Comprehensive local data available
+                            {% elif result.confidence_score >= 0.6 %}
+                                Moderate confidence - Limited local data, using city averages
+                            {% else %}
+                                Low confidence - Estimated using regional data
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Calculation Breakdown -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-calculator me-2"></i>
+                        Calculation Breakdown
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="calculation-item mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Base Price per sq ft:</span>
+                                    <span class="fw-bold">₹{{ result.calculation_breakdown.base_price_per_sqft }}</span>
+                                </div>
+                            </div>
+                            <div class="calculation-item mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Location Multiplier:</span>
+                                    <span class="fw-bold">{{ result.calculation_breakdown.location_multiplier }}x</span>
+                                </div>
+                            </div>
+                            <div class="calculation-item mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Infrastructure Multiplier:</span>
+                                    <span class="fw-bold">{{ result.calculation_breakdown.infrastructure_multiplier }}x</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="calculation-item mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Year Trend Factor:</span>
+                                    <span class="fw-bold">{{ result.calculation_breakdown.year_trend_factor }}x</span>
+                                </div>
+                            </div>
+                            <div class="calculation-item mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Area Type Multiplier:</span>
+                                    <span class="fw-bold">{{ result.calculation_breakdown.area_type_multiplier }}x</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="calculation-item">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-primary fw-bold">Final Price per sq ft:</span>
+                                    <span class="text-primary fw-bold">₹{{ result.estimated_price_per_sqft }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Property Details Summary -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Property Details
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="detail-item mb-2">
+                                <strong>Location:</strong> {{ input_data.locality or input_data.city }}, {{ input_data.state }}
+                            </div>
+                            <div class="detail-item mb-2">
+                                <strong>Plot Size:</strong> {{ input_data.plot_size }} sq ft
+                            </div>
+                            <div class="detail-item mb-2">
+                                <strong>Area Type:</strong> {{ input_data.area_type.title() }}
+                            </div>
+                            <div class="detail-item mb-2">
+                                <strong>Road Width:</strong> {{ input_data.road_width }} feet
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item mb-2">
+                                <strong>Estimation Year:</strong> {{ input_data.year }}
+                            </div>
+                            <div class="detail-item mb-2">
+                                <strong>Schools Nearby:</strong> 
+                                <span class="badge bg-{{ 'success' if input_data.nearby_schools else 'secondary' }}">
+                                    {{ 'Yes' if input_data.nearby_schools else 'No' }}
+                                </span>
+                            </div>
+                            <div class="detail-item mb-2">
+                                <strong>Metro Access:</strong> 
+                                <span class="badge bg-{{ 'success' if input_data.nearby_metro else 'secondary' }}">
+                                    {{ 'Yes' if input_data.nearby_metro else 'No' }}
+                                </span>
+                            </div>
+                            <div class="detail-item mb-2">
+                                <strong>Commercial Area:</strong> 
+                                <span class="badge bg-{{ 'success' if input_data.commercial_area else 'secondary' }}">
+                                    {{ 'Yes' if input_data.commercial_area else 'No' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Data Sources -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-database me-2"></i>
+                        Data Sources
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        {% for source in result.data_sources %}
+                        <li class="mb-1">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            {{ source }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <button class="btn btn-primary btn-lg me-3" onclick="generatePDFReport()">
+                <i class="fas fa-file-pdf me-2"></i>
+                Download PDF Report
+            </button>
+            <a href="{{ url_for('main.index') }}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-calculator me-2"></i>
+                New Estimate
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Include estimation data for PDF generation -->
+<script>
+window.estimationData = {
+    input: {{ input_data | tojson }},
+    result: {{ result | tojson }}
+};
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function generatePDFReport() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    const data = window.estimationData;
+    
+    // Title
+    doc.setFontSize(20);
+    doc.text('Land Price Estimation Report', 20, 20);
+    
+    // Property Details
+    doc.setFontSize(14);
+    doc.text('Property Details:', 20, 40);
+    doc.setFontSize(10);
+    doc.text(`Location: ${data.input.locality || data.input.city}, ${data.input.state}`, 20, 50);
+    doc.text(`Plot Size: ${data.input.plot_size} sq ft`, 20, 60);
+    doc.text(`Area Type: ${data.input.area_type}`, 20, 70);
+    doc.text(`Road Width: ${data.input.road_width} feet`, 20, 80);
+    doc.text(`Estimation Year: ${data.input.year}`, 20, 90);
+    
+    // Amenities
+    doc.text('Amenities:', 20, 110);
+    doc.text(`Schools Nearby: ${data.input.nearby_schools ? 'Yes' : 'No'}`, 20, 120);
+    doc.text(`Metro Access: ${data.input.nearby_metro ? 'Yes' : 'No'}`, 20, 130);
+    doc.text(`Commercial Area: ${data.input.commercial_area ? 'Yes' : 'No'}`, 20, 140);
+    
+    // Estimation Results
+    doc.setFontSize(14);
+    doc.text('Estimation Results:', 20, 160);
+    doc.setFontSize(12);
+    doc.text(`Price per sq ft: ₹${data.result.estimated_price_per_sqft}`, 20, 170);
+    doc.text(`Total Estimated Value: ₹${data.result.total_estimated_price.toLocaleString()}`, 20, 180);
+    doc.text(`Confidence Score: ${Math.round(data.result.confidence_score * 100)}%`, 20, 190);
+    
+    // Calculation Breakdown
+    doc.setFontSize(14);
+    doc.text('Calculation Breakdown:', 20, 210);
+    doc.setFontSize(10);
+    doc.text(`Base Price: ₹${data.result.calculation_breakdown.base_price_per_sqft}`, 20, 220);
+    doc.text(`Location Multiplier: ${data.result.calculation_breakdown.location_multiplier}x`, 20, 230);
+    doc.text(`Infrastructure Multiplier: ${data.result.calculation_breakdown.infrastructure_multiplier}x`, 20, 240);
+    doc.text(`Year Trend Factor: ${data.result.calculation_breakdown.year_trend_factor}x`, 20, 250);
+    doc.text(`Area Type Multiplier: ${data.result.calculation_breakdown.area_type_multiplier}x`, 20, 260);
+    
+    // Footer
+    doc.setFontSize(8);
+    doc.text('Generated by Land Price Estimator - https://landprice.replit.app', 20, 280);
+    doc.text(`Report generated on: ${new Date().toLocaleString()}`, 20, 285);
+    
+    // Save the PDF
+    const filename = `land_price_estimate_${data.input.city}_${Date.now()}.pdf`;
+    doc.save(filename);
+}
+</script>
+{% endblock %}

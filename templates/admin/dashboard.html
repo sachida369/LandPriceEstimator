@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Land Price Estimator{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="display-6">
+                    <i class="fas fa-tachometer-alt text-primary me-3"></i>
+                    Admin Dashboard
+                </h1>
+                <div>
+                    <a href="{{ url_for('auth.data_management') }}" class="btn btn-primary">
+                        <i class="fas fa-database me-2"></i>Data Management
+                    </a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-city fa-2x text-primary mb-3"></i>
+                    <h3 class="card-title">{{ total_cities }}</h3>
+                    <p class="card-text text-muted">Total Cities</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-map-marker-alt fa-2x text-success mb-3"></i>
+                    <h3 class="card-title">{{ total_localities }}</h3>
+                    <p class="card-text text-muted">Total Localities</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-calculator fa-2x text-info mb-3"></i>
+                    <h3 class="card-title">{{ total_estimates }}</h3>
+                    <p class="card-text text-muted">Total Estimates</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-key fa-2x text-warning mb-3"></i>
+                    <h3 class="card-title">{{ total_api_keys }}</h3>
+                    <p class="card-text text-muted">Active API Keys</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Estimates -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-clock me-2"></i>Recent Price Estimates
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if recent_estimates %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date/Time</th>
+                                    <th>Location</th>
+                                    <th>Plot Size</th>
+                                    <th>Estimated Value</th>
+                                    <th>Confidence</th>
+                                    <th>Source</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for estimate in recent_estimates %}
+                                <tr>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ estimate.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ estimate.city }}, {{ estimate.state }}</strong>
+                                        {% if estimate.locality %}
+                                        <br><small class="text-muted">{{ estimate.locality }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ estimate.plot_size_sqft|int }} sq ft</td>
+                                    <td>
+                                        <span class="text-success fw-bold">
+                                            ₹{{ estimate.total_estimated_price|round|int|format_currency }}
+                                        </span>
+                                        <br>
+                                        <small class="text-muted">
+                                            ₹{{ estimate.estimated_price_per_sqft|round }} per sq ft
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px; width: 80px;">
+                                            <div class="progress-bar 
+                                                {% if estimate.confidence_score >= 0.8 %}bg-success
+                                                {% elif estimate.confidence_score >= 0.6 %}bg-warning
+                                                {% else %}bg-danger{% endif %}" 
+                                                style="width: {{ (estimate.confidence_score * 100)|round }}%">
+                                                {{ (estimate.confidence_score * 100)|round }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if estimate.api_key %}
+                                        <span class="badge bg-info">API</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Web</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No estimates yet</h5>
+                        <p class="text-muted">Price estimates will appear here once users start using the service</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="d-grid">
+                                <a href="{{ url_for('auth.data_management') }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-upload me-2"></i>Upload CSV Data
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="d-grid">
+                                <a href="{{ url_for('auth.export_data', data_type='estimates') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-download me-2"></i>Export Estimates
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="d-grid">
+                                <button class="btn btn-outline-info" onclick="showSystemStatus()">
+                                    <i class="fas fa-info-circle me-2"></i>System Status
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status Modal -->
+<div class="modal fade" id="systemStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-server me-2"></i>System Status
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-6">
+                        <strong>Database:</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="badge bg-success">Connected</span>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-6">
+                        <strong>API Endpoints:</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="badge bg-success">Active</span>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-6">
+                        <strong>Data Sources:</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="badge bg-success">Updated</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showSystemStatus() {
+    const modal = new bootstrap.Modal(document.getElementById('systemStatusModal'));
+    modal.show();
+}
+
+// Add custom filter for currency formatting in Jinja (handled server-side)
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-IN').format(amount);
+}
+</script>
+{% endblock %}
