@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+
+{% block title %}Land Price Estimator - Get Accurate Property Valuations{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-4 mb-3">
+                <i class="fas fa-map-marked-alt text-primary me-3"></i>
+                Land Price Estimator India - Accurate Property Valuation Tool
+            </h1>
+            <p class="lead text-muted">
+                Get accurate land price estimates across India based on location, infrastructure, and market trends
+            </p>
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <span class="badge bg-success fs-6">
+                    <i class="fas fa-database me-1"></i>50+ Cities
+                </span>
+                <span class="badge bg-info fs-6">
+                    <i class="fas fa-building me-1"></i>200+ Localities
+                </span>
+                <span class="badge bg-warning fs-6">
+                    <i class="fas fa-chart-line me-1"></i>Real-time Data
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Estimation Form -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-calculator me-2"></i>
+                        Property Details
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.estimate') }}" id="estimationForm">
+                        <div class="row">
+                            <!-- Location Details -->
+                            <div class="col-md-6">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-map-marker-alt me-2"></i>Location
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    <label for="state" class="form-label">State *</label>
+                                    <select class="form-select" id="state" name="state" required>
+                                        <option value="">Select State</option>
+                                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                        <option value="Assam">Assam</option>
+                                        <option value="Bihar">Bihar</option>
+                                        <option value="Chandigarh">Chandigarh</option>
+                                        <option value="Delhi">Delhi</option>
+                                        <option value="Gujarat">Gujarat</option>
+                                        <option value="Haryana">Haryana</option>
+                                        <option value="Jharkhand">Jharkhand</option>
+                                        <option value="Karnataka">Karnataka</option>
+                                        <option value="Kerala">Kerala</option>
+                                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                        <option value="Maharashtra">Maharashtra</option>
+                                        <option value="Punjab">Punjab</option>
+                                        <option value="Rajasthan">Rajasthan</option>
+                                        <option value="Tamil Nadu">Tamil Nadu</option>
+                                        <option value="Telangana">Telangana</option>
+                                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                        <option value="West Bengal">West Bengal</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="city" class="form-label">City *</label>
+                                    <select class="form-select" id="city" name="city" required>
+                                        <option value="">Select State First</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="locality" class="form-label">Locality (Optional)</label>
+                                    <select class="form-select" id="locality" name="locality">
+                                        <option value="">Select City First</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Property Details -->
+                            <div class="col-md-6">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-home me-2"></i>Property
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    <label for="plot_size" class="form-label">Plot Size (sq ft) *</label>
+                                    <input type="number" class="form-control" id="plot_size" name="plot_size" 
+                                           value="1000" min="100" max="100000" required>
+                                    <div class="form-text">Minimum 100 sq ft, Maximum 100,000 sq ft</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="area_type" class="form-label">Area Type</label>
+                                    <select class="form-select" id="area_type" name="area_type">
+                                        <option value="residential">Residential</option>
+                                        <option value="commercial">Commercial</option>
+                                        <option value="agricultural">Agricultural</option>
+                                        <option value="industrial">Industrial</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="year" class="form-label">Estimation Year</label>
+                                    <select class="form-select" id="year" name="year">
+                                        <option value="2024" selected>2024</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Infrastructure Details -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-road me-2"></i>Infrastructure
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="road_width" class="form-label">Road Width (feet)</label>
+                                    <input type="number" class="form-control" id="road_width" name="road_width" 
+                                           value="20" min="6" max="100">
+                                    <div class="form-text">Width of the road accessing the property</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nearby Amenities</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="nearby_schools" name="nearby_schools">
+                                        <label class="form-check-label" for="nearby_schools">
+                                            <i class="fas fa-school me-1"></i>Good Schools (within 2km)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="nearby_metro" name="nearby_metro">
+                                        <label class="form-check-label" for="nearby_metro">
+                                            <i class="fas fa-subway me-1"></i>Metro Station (within 1km)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="commercial_area" name="commercial_area">
+                                        <label class="form-check-label" for="commercial_area">
+                                            <i class="fas fa-store me-1"></i>Commercial Hub Nearby
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-calculator me-2"></i>
+                                Calculate Price Estimate
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Why Choose Our Land Price Estimator?</h2>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <i class="fas fa-database fa-3x text-primary mb-3"></i>
+                    <h3>Comprehensive Real Estate Data</h3>
+                    <p class="text-muted">Real estate data from 50+ cities and 200+ localities across India</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <i class="fas fa-brain fa-3x text-success mb-3"></i>
+                    <h3>AI-Powered Price Algorithm</h3>
+                    <p class="text-muted">Advanced pricing model considering location, infrastructure, and market trends</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <i class="fas fa-shield-alt fa-3x text-info mb-3"></i>
+                    <h3>Transparent & Reliable Results</h3>
+                    <p class="text-muted">Confidence scores and data source transparency for every estimate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Connect with Us Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Connect with Us</h2>
+        </div>
+    </div>
+    
+    <!-- Professional Services & Loan Solutions -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-user-tie me-2"></i>Real Estate Expert
+                    </h3>
+                </div>
+                <div class="card-body text-center">
+                    <h4 class="text-primary mb-3">Bhawna Bairwa</h4>
+                    <p class="text-muted mb-3">Certified Real Estate Consultant</p>
+                    <div class="linkedin-badge-wrapper">
+                        <div class="badge-base LI-profile-badge" data-locale="en_US" data-size="large" data-theme="dark" data-type="HORIZONTAL" data-vanity="bhawna-bairwa-956945376" data-version="v1">
+                            <a class="badge-base__link LI-simple-link" href="https://in.linkedin.com/in/bhawna-bairwa-956945376?trk=profile-badge">Bhawna Bairwa</a>
+                        </div>
+                    </div>
+                    <div class="contact-info mt-3">
+                        <p class="mb-2">
+                            <i class="fas fa-phone text-success me-2"></i>
+                            <strong>Contact: +91 98765 43210</strong>
+                        </p>
+                        <p class="mb-0 text-muted">Expert in Land Valuation & Property Investment</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-university me-2"></i>Financing Solutions
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <h4 class="text-success mb-3">IDFC First Bank Loans</h4>
+                    
+                    <!-- Loan Slider Carousel -->
+                    <div id="loanCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                        <div class="carousel-inner">
+                            <!-- Home Loan Slide -->
+                            <div class="carousel-item active">
+                                <div class="loan-slide text-center">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-5">
+                                            <img src="{{ url_for('static', filename='images/Home_loan_illustration_49e721ab.png') }}" 
+                                                 alt="Home Loan Illustration" class="img-fluid loan-image mb-2" style="max-height: 120px;">
+                                        </div>
+                                        <div class="col-md-7">
+                                            <img src="https://www.idfcfirstbank.com/content/dam/idfc-first-bank/images/logo/logo.svg" 
+                                                 alt="IDFC First Bank Logo" class="bank-logo mb-2" style="height: 30px;">
+                                            <h5 class="text-primary mb-1">Home Loan</h5>
+                                            <p class="text-muted mb-1">Interest rates starting from <strong>8.75%* p.a.</strong></p>
+                                            <p class="small text-success mb-0">✓ Up to ₹5 Crore ✓ Minimal Documentation ✓ Quick Approval</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Property Loan Slide -->
+                            <div class="carousel-item">
+                                <div class="loan-slide text-center">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-5">
+                                            <img src="{{ url_for('static', filename='images/Property_loan_illustration_338d2c5f.png') }}" 
+                                                 alt="Property Loan Illustration" class="img-fluid loan-image mb-2" style="max-height: 120px;">
+                                        </div>
+                                        <div class="col-md-7">
+                                            <img src="https://www.idfcfirstbank.com/content/dam/idfc-first-bank/images/logo/logo.svg" 
+                                                 alt="IDFC First Bank Logo" class="bank-logo mb-2" style="height: 30px;">
+                                            <h5 class="text-primary mb-1">Property Loan</h5>
+                                            <p class="text-muted mb-1">Loan against property at <strong>9.50%* p.a.</strong></p>
+                                            <p class="small text-success mb-0">✓ Up to ₹10 Crore ✓ Flexible Tenure ✓ Fast Processing</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Car Loan Slide -->
+                            <div class="carousel-item">
+                                <div class="loan-slide text-center">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-5">
+                                            <img src="{{ url_for('static', filename='images/Car_loan_illustration_efd805a9.png') }}" 
+                                                 alt="Car Loan Illustration" class="img-fluid loan-image mb-2" style="max-height: 120px;">
+                                        </div>
+                                        <div class="col-md-7">
+                                            <img src="https://www.idfcfirstbank.com/content/dam/idfc-first-bank/images/logo/logo.svg" 
+                                                 alt="IDFC First Bank Logo" class="bank-logo mb-2" style="height: 30px;">
+                                            <h5 class="text-primary mb-1">Car Loan</h5>
+                                            <p class="text-muted mb-1">Auto financing from <strong>7.25%* p.a.</strong></p>
+                                            <p class="small text-success mb-0">✓ Up to 100% Financing ✓ New & Used Cars ✓ Zero Processing Fee</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Personal Loan Slide -->
+                            <div class="carousel-item">
+                                <div class="loan-slide text-center">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-5">
+                                            <img src="{{ url_for('static', filename='images/Personal_loan_illustration_de75e68d.png') }}" 
+                                                 alt="Personal Loan Illustration" class="img-fluid loan-image mb-2" style="max-height: 120px;">
+                                        </div>
+                                        <div class="col-md-7">
+                                            <img src="https://www.idfcfirstbank.com/content/dam/idfc-first-bank/images/logo/logo.svg" 
+                                                 alt="IDFC First Bank Logo" class="bank-logo mb-2" style="height: 30px;">
+                                            <h5 class="text-primary mb-1">Personal Loan</h5>
+                                            <p class="text-muted mb-1">Instant personal loans at <strong>10.99%* p.a.</strong></p>
+                                            <p class="small text-success mb-0">✓ Up to ₹40 Lakh ✓ Digital Process ✓ Same Day Approval</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Business Loan Slide -->
+                            <div class="carousel-item">
+                                <div class="loan-slide text-center">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-5">
+                                            <img src="{{ url_for('static', filename='images/Business_loan_illustration_4df4768a.png') }}" 
+                                                 alt="Business Loan Illustration" class="img-fluid loan-image mb-2" style="max-height: 120px;">
+                                        </div>
+                                        <div class="col-md-7">
+                                            <img src="https://www.idfcfirstbank.com/content/dam/idfc-first-bank/images/logo/logo.svg" 
+                                                 alt="IDFC First Bank Logo" class="bank-logo mb-2" style="height: 30px;">
+                                            <h5 class="text-primary mb-1">Business Loan</h5>
+                                            <p class="text-muted mb-1">Business financing from <strong>11.25%* p.a.</strong></p>
+                                            <p class="small text-success mb-0">✓ Up to ₹75 Lakh ✓ Working Capital ✓ Equipment Finance</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Carousel Controls -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#loanCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#loanCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        
+                        <!-- Carousel Indicators -->
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#loanCarousel" data-bs-slide-to="0" class="active"></button>
+                            <button type="button" data-bs-target="#loanCarousel" data-bs-slide-to="1"></button>
+                            <button type="button" data-bs-target="#loanCarousel" data-bs-slide-to="2"></button>
+                            <button type="button" data-bs-target="#loanCarousel" data-bs-slide-to="3"></button>
+                            <button type="button" data-bs-target="#loanCarousel" data-bs-slide-to="4"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <a href="tel:+919876543210" class="btn btn-success btn-sm me-2">
+                            <i class="fas fa-phone me-1"></i>Call Bhawna
+                        </a>
+                        <small class="text-muted d-block mt-2">*Terms & Conditions Apply</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stateSelect = document.getElementById('state');
+    const citySelect = document.getElementById('city');
+    const localitySelect = document.getElementById('locality');
+    
+    // City data mapping
+    const cityData = {
+        'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Thane', 'Pimpri-Chinchwad', 'Nashik', 'Kalyan-Dombivli', 'Vasai-Virar', 'Solapur'],
+        'Karnataka': ['Bangalore', 'Mysore'],
+        'Delhi': ['Delhi'],
+        'Tamil Nadu': ['Chennai', 'Madurai', 'Coimbatore', 'Tiruchirappalli'],
+        'Gujarat': ['Ahmedabad', 'Vadodara', 'Rajkot'],
+        'Rajasthan': ['Jaipur', 'Jodhpur', 'Kota'],
+        'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Ghaziabad', 'Agra', 'Meerut', 'Varanasi', 'Aligarh', 'Allahabad', 'Bareilly'],
+        'West Bengal': ['Kolkata', 'Howrah'],
+        'Punjab': ['Ludhiana', 'Amritsar', 'Jalandhar'],
+        'Haryana': ['Faridabad'],
+        'Madhya Pradesh': ['Indore', 'Bhopal', 'Gwalior', 'Jabalpur'],
+        'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada'],
+        'Bihar': ['Patna'],
+        'Telangana': ['Hyderabad'],
+        'Jharkhand': ['Ranchi'],
+        'Assam': ['Guwahati'],
+        'Chandigarh': ['Chandigarh'],
+        'Kerala': ['Thiruvananthapuram']
+    };
+    
+    stateSelect.addEventListener('change', function() {
+        const selectedState = this.value;
+        citySelect.innerHTML = '<option value="">Select City</option>';
+        localitySelect.innerHTML = '<option value="">Select City First</option>';
+        
+        if (selectedState && cityData[selectedState]) {
+            cityData[selectedState].forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                citySelect.appendChild(option);
+            });
+        }
+    });
+    
+    citySelect.addEventListener('change', function() {
+        const selectedCity = this.value;
+        localitySelect.innerHTML = '<option value="">Loading...</option>';
+        
+        if (selectedCity) {
+            // Find city ID from the cities data
+            fetch(`/api/localities/1`) // This would need proper city ID mapping
+                .then(response => response.json())
+                .then(data => {
+                    localitySelect.innerHTML = '<option value="">Select Locality (Optional)</option>';
+                    // This would populate with actual locality data from API
+                })
+                .catch(error => {
+                    localitySelect.innerHTML = '<option value="">Select Locality (Optional)</option>';
+                });
+        }
+    });
+});
+</script>
+{% endblock %}
